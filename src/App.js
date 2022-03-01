@@ -1,8 +1,16 @@
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from '@mui/material/Typography'
+
 function App() {
   return (
-    <div className="App">
-      <h1>hello world</h1>
-    </div>
+    <Box className="App">
+      <Container>
+        <Typography variant="h4" component="h1" sx={ { fontWeight: "bold", mt: 2 } } gutterBottom>
+          To Rent
+        </Typography>
+      </Container>
+    </Box>
   )
 }
 
