@@ -3,7 +3,7 @@ import { GlobalContext } from './contexts/GlobalContext'
 import Box from '@mui/material/Box'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import moment from "moment"
-import { isWeekend, isFriday, fetchDataByUrl } from '../helper'
+import { isWeekend, isFriday, fetchDataByUrl, makeKeywordSearch } from '../helper'
 import Search from './Search'
 
 const DataGridTable = ({ title, columns, url }) => {
@@ -19,7 +19,7 @@ const DataGridTable = ({ title, columns, url }) => {
   const onFilterModelChange = useCallback((filterModel) => {
     setFilterModel(filterModel.items)
   }, [])
-  console.log(state[title])
+
   useEffect(() => {
     const getData = async () => {
       setState(prevState => ({ ...prevState, loading: true }))
@@ -27,7 +27,7 @@ const DataGridTable = ({ title, columns, url }) => {
       SetTotal(totalData.length)
       let queryUrl = `${url}?_page=${page}&_limit=${pageSize}`
       if (query) {
-        queryUrl += `&q=${query}`
+        queryUrl += `&q=${makeKeywordSearch(query)}`
       }
       sortModel.map(item => {
         queryUrl += `&_sort=${item.field}&_order=${item.sort}`
@@ -45,7 +45,19 @@ const DataGridTable = ({ title, columns, url }) => {
           )) {
             return
           }
-          queryUrl += `&_filter=${item.columnField}&_filterOperatorValue=${item.operatorValue}&_filterValue=${item.value}`
+          if (item.operatorValue === "contains") {
+            queryUrl += `&${item.columnField}_like=${makeKeywordSearch(item.value)}`
+          } else if (item.operatorValue === "equals") {
+            queryUrl += `&${item.columnField}=${makeKeywordSearch(item.value)}`
+          } else if (item.operatorValue === "startsWith") {
+            queryUrl += `&${item.columnField}_like=${makeKeywordSearch(item.value)}`
+          } else if (item.operatorValue === "endsWith") {
+            queryUrl += `&${item.columnField}_like=${makeKeywordSearch(item.value)}`
+          } else if (item.operatorValue === "isAnyOf") {
+            item.value.map(value => {
+              queryUrl += `&${item.columnField}=${makeKeywordSearch(value)}`
+            })
+          }
         })
       }
       const data = await fetchDataByUrl(queryUrl)

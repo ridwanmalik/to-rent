@@ -6,16 +6,16 @@ import DataGridTable from './components/DataGridTable'
 function App() {
 
   const columns = [
-    { field: 'code', headerName: 'Code' },
-    { field: 'name', headerName: 'Name', width: 200 },
-    { field: 'type', headerName: 'Type' },
-    { field: 'availability', headerName: 'Availability' },
-    { field: 'needing_repair', headerName: 'Needing Repair' },
-    { field: 'durability', headerName: 'Durability' },
-    { field: 'max_durability', headerName: 'Max Durability' },
-    { field: 'mileage', headerName: 'Mileage' },
-    { field: 'price', headerName: 'Price' },
-    { field: 'minimum_rent_period', headerName: 'MR Period', description: 'Minimum Rent Period' },
+    { field: 'code', headerName: 'Code', type: 'string' },
+    { field: 'name', headerName: 'Name', type: 'string', width: 200 },
+    { field: 'type', headerName: 'Type', type: 'string' },
+    { field: 'availability', headerName: 'Availability', type: 'boolean' },
+    { field: 'needing_repair', headerName: 'Needing Repair', type: 'boolean' },
+    { field: 'durability', headerName: 'Durability', type: 'number' },
+    { field: 'max_durability', headerName: 'Max Durability', type: 'number' },
+    { field: 'mileage', headerName: 'Mileage', type: 'number' },
+    { field: 'price', headerName: 'Price', type: 'number' },
+    { field: 'minimum_rent_period', headerName: 'MR Period', description: 'Minimum Rent Period', type: 'number' },
   ]
 
   return (

@@ -24,3 +24,12 @@ export const isFriday = (date) => {
 export const isSaturday = (date) => {
   return date.day() === 6
 }
+
+// make keyword search
+export const makeKeywordSearch = (keyword) => {
+  const reservedSymbols = ['-', '+', '<', '>', '@', '(', ')', '~', '*', '?', ':', '"', '\'', '&', '$', '#', '%', '^', '{', '}', '[', ']', '|', '\\', '/', '_', '.']
+  keyword = keyword.replace(reservedSymbols, "")
+  keyword = keyword.toLowerCase()
+  keyword = keyword.replace(/[^A-Za-z0-9\-]/g, "")
+  return keyword
+}
