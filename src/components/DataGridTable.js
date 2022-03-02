@@ -10,7 +10,7 @@ const DataGridTable = ({ title, columns, url }) => {
   const today = moment()
   const [state, setState] = useContext(GlobalContext)
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(5)
   const [total, SetTotal] = useState(0)
   const [query, setQuery] = useState('')
   const [sortModel, setSortModel] = useState([])
