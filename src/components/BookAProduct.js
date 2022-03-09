@@ -18,11 +18,13 @@ import FormHelperText from '@mui/material/FormHelperText'
 
 const BookAProduct = () => {
   const [state] = useContext(GlobalContext)
-  const [openBook, setOpenBook] = useState(false)
+  const [openBooking, setOpenBooking] = useState(false)
+  const [openCalculation, setOpenCalculation] = useState(false)
   const [product, setProduct] = useState('')
   const today = moment()
+  const tomorrow = moment().add(1, 'days')
   const [fromDate, setFromDate] = useState(today)
-  const [toDate, setToDate] = useState(today)
+  const [toDate, setToDate] = useState(tomorrow)
   const [errors, setErrors] = useState({
     product: false,
   })
@@ -30,6 +32,10 @@ const BookAProduct = () => {
 
   const handleProductChange = (event) => {
     setErrors({ ...errors, product: false })
+    const selectedProduct = state.products.find(productData => productData.code === event.target.value)
+    const selectedProductMinimumRentPeriod = selectedProduct.minimum_rent_period
+    const toDate = moment(fromDate).add(selectedProductMinimumRentPeriod, 'days')
+    setToDate(toDate)
     setProduct(event.target.value)
   }
 
@@ -43,18 +49,18 @@ const BookAProduct = () => {
     setToDate(date)
   }
 
-  const handleBookOpen = () => {
-    setOpenBook(true)
+  const handleBookingOpen = () => {
+    setOpenBooking(true)
   }
 
-  const handleBookClose = () => {
+  const handleBookingClose = () => {
     setProduct('')
     setFromDate(today)
-    setToDate(today)
-    setOpenBook(false)
+    setToDate(tomorrow)
+    setOpenBooking(false)
   }
 
-  const handleBooking = () => {
+  const handleBookingSubmit = () => {
     if (product === '') {
       setErrors({ ...errors, product: true })
       return
@@ -64,15 +70,25 @@ const BookAProduct = () => {
       return
     }
 
+    const selectedProduct = state.products.find(productData => productData.code === product)
+    const bookingDays = moment(toDate).diff(moment(fromDate), 'days') + 1
+    const bookingPrice = selectedProduct.price * bookingDays
+
+    console.log(`Log | file: BookAProduct.js | line 71 | bookingDays`, bookingDays)
+    console.log(`Log | file: BookAProduct.js | line 71 | bookingPrice`, bookingPrice)
+
     // state.bookProduct(product, fromDate, toDate)
-    handleBookClose()
+    handleBookingClose()
   }
 
+  const handleCalculateClose = () => {
+    setOpenCalculation(false)
+  }
 
   return (
     <>
-      <Button variant="contained" onClick={ handleBookOpen }>Book</Button>
-      <Dialog open={ openBook } onClose={ handleBookClose }>
+      <Button variant="contained" onClick={ handleBookingOpen }>Book</Button>
+      <Dialog open={ openBooking } onClose={ handleBookingClose }>
         <DialogTitle>Book a product</DialogTitle>
         <DialogContent>
           <DialogContentText sx={ { mb: 2.5 } }>
@@ -103,7 +119,7 @@ const BookAProduct = () => {
                 showDaysOutsideCurrentMonth
                 minDate={ today }
               />
-              { errors.fromDate && errors.toDate && <FormHelperText> Please select a valid date range</FormHelperText> }
+              { errors.fromDate && errors.toDate && <FormHelperText>Please select a valid date range</FormHelperText> }
             </FormControl>
             <FormControl error={ errors.fromDate }>
               <MobileDatePicker
@@ -112,15 +128,23 @@ const BookAProduct = () => {
                 onChange={ handleToDateChange }
                 renderInput={ (params) => <TextField { ...params } error={ errors.toDate } /> }
                 showDaysOutsideCurrentMonth
-                minDate={ today }
+                minDate={ tomorrow }
               />
             </FormControl>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={ handleBookClose }>Cancel</Button>
-          <Button variant="contained" onClick={ handleBooking }>Book</Button>
+          <Button onClick={ handleBookingClose }>Cancel</Button>
+          <Button variant="contained" onClick={ handleBookingSubmit }>Book</Button>
         </DialogActions>
+      </Dialog>
+      <Dialog open={ openCalculation } onClose={ handleCalculateClose }>
+        <DialogTitle>Book a product</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={ { mb: 2.5 } }>
+            To book a product, please fill the form below.
+          </DialogContentText>
+        </DialogContent>
       </Dialog>
     </>
   )

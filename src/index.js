@@ -4,7 +4,7 @@ import App from './App'
 import { GlobalProvider } from "./components/contexts/GlobalContext"
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
-import AdapterDateFns from '@mui/lab/AdapterDateFns'
+import DateAdapter from '@mui/lab/AdapterMoment'
 import LocalizationProvider from '@mui/lab/LocalizationProvider'
 import reportWebVitals from './reportWebVitals'
 import theme from './theme'
@@ -13,7 +13,7 @@ import './styles/index.css'
 ReactDOM.render(
   <React.StrictMode>
     <GlobalProvider>
-      <LocalizationProvider dateAdapter={ AdapterDateFns }>
+      <LocalizationProvider dateAdapter={ DateAdapter }>
         <ThemeProvider theme={ theme }>
           <CssBaseline />
           <App />
