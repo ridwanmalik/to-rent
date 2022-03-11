@@ -13,10 +13,10 @@ import Select from '@mui/material/Select'
 import Alert from '@mui/material/Alert'
 import Snackbar from '@mui/material/Snackbar'
 import MobileDatePicker from '@mui/lab/MobileDatePicker'
-import { GlobalContext } from './contexts/GlobalContext'
+import FormHelperText from '@mui/material/FormHelperText'
 import Box from '@mui/material/Box'
 import moment from "moment"
-import FormHelperText from '@mui/material/FormHelperText'
+import { GlobalContext } from './contexts/GlobalContext'
 import { fetchData } from '../helper'
 
 const BookAProduct = () => {
@@ -65,6 +65,9 @@ const BookAProduct = () => {
     setProduct('')
     setFromDate(today)
     setToDate(tomorrow)
+    setProductPrice(0)
+    setProductMileage(0)
+    setProductDurability(0)
     setOpenBooking(true)
   }
 
@@ -101,7 +104,6 @@ const BookAProduct = () => {
     setOpenCalculation(true)
     setProductPrice(bookingPrice)
     handleBookingClose()
-    setOpenCalculation(true)
   }
 
 

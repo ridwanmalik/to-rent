@@ -1,9 +1,9 @@
-import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import DataGridTable from './components/DataGridTable'
 import BookAProduct from './components/BookAProduct'
+import ReturnAProduct from './components/ReturnAProduct'
 
 
 function App() {
@@ -30,7 +30,7 @@ function App() {
         <DataGridTable title="products" columns={ columns } url="products" />
         <Box sx={ { display: "flex", justifyContent: "flex-end", gap: 2.5 } }>
           <BookAProduct />
-          <Button variant="contained" color="secondary">Return</Button>
+          <ReturnAProduct />
         </Box>
 
       </Container>
