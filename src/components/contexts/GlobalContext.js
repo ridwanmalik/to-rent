@@ -6,6 +6,7 @@ export const GlobalProvider = (props) => {
 
   const initialState = {
     loading: true,
+    fetch: 1,
     rowsPerPageOptions: [5, 10, 25, 50, 100],
     products: [],
   }

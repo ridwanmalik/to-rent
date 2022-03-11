@@ -3,7 +3,7 @@ import { GlobalContext } from './contexts/GlobalContext'
 import Box from '@mui/material/Box'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import moment from "moment"
-import { isWeekend, isFriday, fetchDataByUrl, makeKeywordSearch } from '../helper'
+import { isWeekend, isFriday, fetchGetData, makeKeywordSearch } from '../helper'
 import Search from './Search'
 
 const DataGridTable = ({ title, columns, url }) => {
@@ -23,7 +23,7 @@ const DataGridTable = ({ title, columns, url }) => {
   useEffect(() => {
     const getData = async () => {
       setState(prevState => ({ ...prevState, loading: true }))
-      const totalData = await fetchDataByUrl(url)
+      const totalData = await fetchGetData(url)
       SetTotal(totalData.length)
       let queryUrl = `${url}?_page=${page}&_limit=${pageSize}`
       if (query) {
@@ -60,13 +60,13 @@ const DataGridTable = ({ title, columns, url }) => {
           }
         })
       }
-      const data = await fetchDataByUrl(queryUrl)
+      const data = await fetchGetData(queryUrl)
       if (data) {
         setState(prevState => ({ ...prevState, [title]: data, loading: false }))
       }
     }
     getData()
-  }, [pageSize, page, sortModel, filterModel, query])
+  }, [pageSize, page, sortModel, filterModel, query, state.fetch])
 
   return (
     <Box>

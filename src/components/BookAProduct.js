@@ -10,17 +10,30 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
+import Alert from '@mui/material/Alert'
+import Snackbar from '@mui/material/Snackbar'
 import MobileDatePicker from '@mui/lab/MobileDatePicker'
 import { GlobalContext } from './contexts/GlobalContext'
 import Box from '@mui/material/Box'
 import moment from "moment"
 import FormHelperText from '@mui/material/FormHelperText'
+import { fetchData } from '../helper'
 
 const BookAProduct = () => {
-  const [state] = useContext(GlobalContext)
+  const messages = {
+    success: 'The product is successfully booked!',
+    error: 'Something went wrong! please try again later.',
+  }
+  const [state, setState] = useContext(GlobalContext)
   const [openBooking, setOpenBooking] = useState(false)
+  const [alertBox, setAlertBox] = useState(false)
+  const [alertMessage, setAlertMessage] = useState(messages.error)
+  const [alertType, setAlertType] = useState("error")
   const [openCalculation, setOpenCalculation] = useState(false)
   const [product, setProduct] = useState('')
+  const [productPrice, setProductPrice] = useState(0)
+  const [productMileage, setProductMileage] = useState(0)
+  const [productDurability, setProductDurability] = useState(0)
   const today = moment()
   const tomorrow = moment().add(1, 'days')
   const [fromDate, setFromDate] = useState(today)
@@ -28,7 +41,6 @@ const BookAProduct = () => {
   const [errors, setErrors] = useState({
     product: false,
   })
-
 
   const handleProductChange = (event) => {
     setErrors({ ...errors, product: false })
@@ -50,13 +62,13 @@ const BookAProduct = () => {
   }
 
   const handleBookingOpen = () => {
+    setProduct('')
+    setFromDate(today)
+    setToDate(tomorrow)
     setOpenBooking(true)
   }
 
   const handleBookingClose = () => {
-    setProduct('')
-    setFromDate(today)
-    setToDate(tomorrow)
     setOpenBooking(false)
   }
 
@@ -71,19 +83,79 @@ const BookAProduct = () => {
     }
 
     const selectedProduct = state.products.find(productData => productData.code === product)
-    const bookingDays = moment(toDate).diff(moment(fromDate), 'days') + 1
+    const bookingDays = moment(toDate).diff(moment(fromDate), 'days')
     const bookingPrice = selectedProduct.price * bookingDays
 
-    console.log(`Log | file: BookAProduct.js | line 71 | bookingDays`, bookingDays)
-    console.log(`Log | file: BookAProduct.js | line 71 | bookingPrice`, bookingPrice)
-
-    // state.bookProduct(product, fromDate, toDate)
+    switch (selectedProduct.type) {
+      case "plain":
+        setProductDurability(selectedProduct.durability - bookingDays)
+        break
+      case "meter":
+        const bookingMileage = selectedProduct.mileage + (10 * bookingDays)
+        setProductMileage(bookingMileage)
+        setProductDurability(selectedProduct.durability - (bookingDays * 4))
+        break
+      default:
+        break
+    }
+    setOpenCalculation(true)
+    setProductPrice(bookingPrice)
     handleBookingClose()
+    setOpenCalculation(true)
   }
+
 
   const handleCalculateClose = () => {
     setOpenCalculation(false)
   }
+
+  const handleCalculationClose = () => {
+    setOpenCalculation(false)
+    setProductPrice(0)
+    setProductMileage(0)
+    setProductDurability(0)
+  }
+
+  const handleCalculationSubmit = async () => {
+    const selectedProduct = state.products.find(productData => productData.code === product)
+
+    var requestHeaders = new Headers()
+    requestHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+      "mileage": selectedProduct.type === "meter" ? productMileage : undefined,
+      "durability": productDurability,
+      "availability": false
+    })
+
+    var requestOptions = {
+      method: 'PATCH',
+      headers: requestHeaders,
+      body: raw,
+      redirect: 'follow'
+    }
+
+    const data = await fetchData(`products/${selectedProduct.code}`, requestOptions)
+    if (data.code) {
+      setAlertType("success")
+      setAlertMessage(messages.success)
+      setState(prevState => ({ ...prevState, fetch: state.fetch + 1 }))
+    } else {
+      setAlertType("error")
+      setAlertMessage(messages.error)
+    }
+    setAlertBox(true)
+    handleCalculationClose()
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+
+    setAlertBox(false)
+  }
+
 
   return (
     <>
@@ -128,7 +200,7 @@ const BookAProduct = () => {
                 onChange={ handleToDateChange }
                 renderInput={ (params) => <TextField { ...params } error={ errors.toDate } /> }
                 showDaysOutsideCurrentMonth
-                minDate={ tomorrow }
+                minDate={ toDate }
               />
             </FormControl>
           </Box>
@@ -142,10 +214,21 @@ const BookAProduct = () => {
         <DialogTitle>Book a product</DialogTitle>
         <DialogContent>
           <DialogContentText sx={ { mb: 2.5 } }>
-            To book a product, please fill the form below.
+            Your estimated price is ${ productPrice }
+            <br />
+            Do you want to proceed?
           </DialogContentText>
         </DialogContent>
+        <DialogActions>
+          <Button onClick={ handleCalculationClose }>No</Button>
+          <Button variant="contained" onClick={ handleCalculationSubmit }>Yes</Button>
+        </DialogActions>
       </Dialog>
+      <Snackbar open={ alertBox } onClose={ handleClose } autoHideDuration={ 6000 }>
+        <Alert onClose={ handleClose } severity={ alertType } sx={ { width: '100%' } }>
+          { alertMessage }
+        </Alert>
+      </Snackbar>
     </>
   )
 }

@@ -23,8 +23,8 @@ function App() {
 
   return (
     <Box className="App">
-      <Container>
-        <Typography variant="h4" component="h1" sx={ { fontWeight: "bold", mt: 2 } } gutterBottom>
+      <Container sx={ { my: 5 } }>
+        <Typography variant="h4" component="h1" sx={ { fontWeight: "bold" } } gutterBottom>
           To Rent
         </Typography>
         <DataGridTable title="products" columns={ columns } url="products" />
